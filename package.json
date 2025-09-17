@@ -2,7 +2,14 @@
   "name": "playwright-saucedemo-pom",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "pw:run": "npx playwright test",
+    "pw:ui": "npx playwright test --ui",
+    "pw:run:headed": "npx playwright test --headed",
+    "pw:debug": "npx playwright test --debug",
+    "pw:run:report": "npx playwright test --reporter=html && npx playwright show-report",
+    "pw:show:report": "npx playwright show-report"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -10,5 +17,8 @@
   "devDependencies": {
     "@playwright/test": "^1.55.0",
     "@types/node": "^24.5.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2"
   }
 }

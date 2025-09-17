@@ -1,59 +1,39 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
+import { BasePage } from './pages/basePage'
 
-test('do login with standard user', async ({ page }) => {
-  await page.goto('/')
+import data from './fixtures/data.json'
 
-  await expect(page).toHaveTitle('Swag Labs')
+let bp: BasePage
 
-  await page.locator('[data-test="username"]').fill('standard_user')
-  await page.locator('[data-test="password"]').fill('secret_sauce')
-  await page.locator('[data-test="login-button"]').click()
-  await expect(page.locator('[data-test="title"]')).toBeVisible()
+test.beforeEach(({page}) =>{
+  bp = new BasePage(page)
+  bp.visitPage('/')
+})
 
-});
+test.describe('sauce demo happy path', () => {
+  test('do login with standard user', async () => {
+    await bp.loginPage.login(data.visualUser.username,data.visualUser.password)
+  });
 
-test('search for any product and add it to cart', async ({ page }) => {
-  await page.goto('/')
+  test('search for any product and add it to cart', async ({ page }) => {
+    await bp.loginPage.login(data.standardUser.username,data.standardUser.password)
 
-  await expect(page).toHaveTitle('Swag Labs')
+    const product        = await bp.inventoryPage.chooseProduct()
+    const productDetails = await bp.inventoryPage.getProductDetails(product)
 
-  await page.locator('data-test=username').fill('standard_user')
-  await page.locator('data-test=password').fill('secret_sauce')
-  await page.locator('data-test=login-button').click()
-  
-  await expect(page.locator('data-test=title')).toBeVisible();
+    await bp.textValidators.validateTextByRole(page.getByRole('button', {name: 'Remove'}),'Remove')
 
+    await bp.inventoryPage.clickOnCart()
 
-  const allProducts     = page.locator('data-test=inventory-item')
-  const count           = await  allProducts.count()
-  const randomIndex     = Math.floor(Math.random() * count)
+    await bp.textValidators.validateTextByLocator('data-test=inventory-item-name',productDetails.name)
+    await bp.textValidators.validateTextByLocator('data-test=inventory-item-desc',productDetails.details)
+    await bp.textValidators.validateTextByLocator('data-test=inventory-item-price',productDetails.price)
 
-  const specificProduct = allProducts.nth(randomIndex)
-  
-  await specificProduct.getByRole('button', {name: 'Add to cart'}).click()
-
-  const productName    = await specificProduct.locator('data-test=inventory-item-name').innerText()
-  const prodcutDetails = await specificProduct.locator('data-test=inventory-item-desc').innerText()
-  const productPrice   = await specificProduct.locator('data-test=inventory-item-price').innerText()
-
-  await expect(page.getByRole('button', {name: 'Remove'})).toHaveText('Remove')
-  
-  await page.locator('.shopping_cart_container').click({force: true})
-
-
-  await expect(page.locator('data-test=inventory-item-name')).toHaveText(productName)
-  await expect(page.locator('data-test=inventory-item-desc')).toHaveText(prodcutDetails)
-  await expect(page.locator('data-test=inventory-item-price')).toHaveText(productPrice)
-  
-  await page.getByRole('button',{name: 'Checkout'}).click()
-  
-  await page.getByRole('textbox', {name: 'First Name'}).fill('Automation')
-  await page.getByRole('textbox', {name: 'Last Name'}).fill('Testing')
-  await page.getByRole('textbox', {name: 'Zip/Postal Code'}).fill('34732126')
-  
-  await page.getByRole('button',{name: 'Continue'}).click()
-  await page.getByRole('button',{name: 'Finish'}).click()
-  
-  await expect(page.getByRole('heading')).toHaveText('Thank you for your order!')
-});
-
+    await bp.cartPage.clickOnCheckout()
+    
+    await bp.checkoutPage.fillForm()
+    await bp.checkoutPage.finishCheckout()
+    
+    await bp.textValidators.validateTextByRole(page.getByRole('heading'),'Thank you for your order!')
+  });
+})
