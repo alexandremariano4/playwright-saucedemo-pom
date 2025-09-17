@@ -10,7 +10,4 @@ export class Functions {
         this.page = page
     }
 
-    async isElementVisible(locator: string){
-        return await this.page.locator(locator).isVisible()
-    }
 }

@@ -11,9 +11,9 @@
     "pw:show:report": "npx playwright show-report"
   },
   "keywords": [],
-  "author": "",
+  "author": "Alexandre Mariano",
   "license": "ISC",
-  "description": "",
+  "description": "Projeto criado para testar tecnicamente as minhas skills com playwright",
   "devDependencies": {
     "@playwright/test": "^1.55.0",
     "@types/node": "^24.5.1"
