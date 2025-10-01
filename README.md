@@ -48,12 +48,7 @@ cd playwright-saucedemo-pom
 npm install
 ```
 
-3. Instale os browsers do Playwright:
-```bash
-npx playwright install
-```
-
-4. Verifique se está configurado o arquivo `.env` com a URL base:
+3. Verifique se está configurado o arquivo `.env` com a URL base:
 ```env
 BASE_URL=https://www.saucedemo.com
 ```
